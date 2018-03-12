@@ -1,16 +1,45 @@
 
-var song;
-function preload(){
-song=loadSound("steam.mp3");
+var Sound = function(fileName) {
+    var fileName = fileName;
+    var isPlaying = false;
+    var sound;
 
+    this.play = function(){
+        if(typeof sound === 'undefined') {
+            sound = loadSound(fileName, function(data) {
+                sound = data;
+                sound.play();
+            },
+            function(err) {
+                alert('there was an error loading the sound  file');
+            });
+        } else {
+            sound.play();
+        }
+
+        isPlaying = true;
+    };
+
+    this.stop = function() {
+        if(typeof sound != 'undefined') {
+            sound.stop();
+            isPlaying = false;
+        }
+    };
+
+    this.toggle = function() {
+        if(isPlaying) {
+            this.stop();
+        } else {
+            this.play();
+        }
+    };
 }
+
+var backgroundSound = new Sound("steam.mp3");
+
 function setup() {
     createCanvas(1432,672);
-
-
-song.play();
-
-
 }
 
 var health=300;
@@ -85,8 +114,29 @@ var pVV=0;
 var bX=pX;
 var bY=pY;
 
-scene="game";
+scene="menu";
+var menu = function() {
+    background(100);
+    fill(255);
+    noStroke();
+    rect(200,200,200,100,20);
+    rect(1000,200,200,100,20);
+    fill(0);
+    textSize(70);
+    text("play",230,270);
+    textSize(55);
+    text("settings",1000,270);
+};
 
+var settings=function(){
+    background(100);
+    fill(255);
+    rect(1300,600,200,200);
+    rect(200,200,200,100,20);
+    fill(0);
+    text("back",1300,650)
+    text("music",220,270);
+};
   
 Background=function(x,y,w,h){
 this.x=x;
@@ -183,9 +233,24 @@ keyPressed = function() {
 mousePressed=function(){
     direction = mouseX > pX ? 1 : -1;
     bullets.push(new Bullet(pX, pY, direction));
+if (scene==="menu"&&mouseX>200&&mouseY>200&&mouseY<300&&mouseX<400){
+
+  scene="game";  
+}if (scene==="menu"&&mouseX>1000&&mouseY>200&&mouseY<300&&mouseX<1200){
+
+    scene="settings"; 
+}if (scene==="settings"&&mouseX>1300&&mouseY>600){
+
+    scene="menu";
+}if (scene==="settings"&&mouseX>200&&mouseY>200&&mouseY<300&&mouseX<400){
+    backgroundSound.toggle();
+  
+  
+}
+
 };
 
-draw=function(){
+draw = function(){
 if (health<1){
 
     scene="dead";
@@ -208,17 +273,21 @@ if (health>=300){
         pVV -= pG;
     }
 
-game();
-if (keyIsDown(68)) {
-    pX += 5;
-  }if (keyIsDown(65)) {
-    pX -=5;;
-  }
-  
-}if (scene==="dead"){
-    isDead();
+    game();
+    if (keyIsDown(68)) {
+        pX += 5;
+      }if (keyIsDown(65)) {
+        pX -=5;;
+      }
+      
+    }if (scene==="dead"){
+        isDead();
 
-}
+    }if (scene==="menu"){
 
+        menu();
+    }if (scene==="settings"){
 
+        settings();
+    }
 };
